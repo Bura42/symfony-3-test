@@ -8,6 +8,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Genus;
 use AppBundle\Entity\Task;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -18,12 +19,45 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class GenusController extends Controller {
 
   /**
-   * @Route("/genus/{genusName}")
+   * @Route("/genus/new")
+   */
+
+  public function newAction() {
+    $genus = new Genus();
+    $genus ->setName('Octopus'.rand(1,100));
+    $genus ->setSubFamily('Octopodianae');
+    $genus ->setSpeciesCount(rand(100,99999));
+
+    $em = $this->getDoctrine()->getManager();
+    $em->persist($genus);
+    $em->flush();
+
+    return new Response('<html><body>Genus Created </body></html>');
+  }
+
+  /**
+   * @Route("/genus")
+   */
+  public function listAction() {
+
+    $em = $this->getDoctrine()->getManager();
+
+
+    $genuses = $em->getRepository('AppBundle:Genus')
+      ->findAllPublishedOrderedBySize();
+
+    return $this->render('genus/list.html.twig', [
+      'genuses'=>$genuses,
+    ]);
+  }
+  /**
+   * @Route("/genus/{genusName}", name="genus_show")
    */
   public function showAction($genusName) {
 
@@ -33,25 +67,31 @@ class GenusController extends Controller {
     //        ]);
     //
     //        return new Response($html);
-    $funFact = 'Octopuses can change the color of their body in just *three-tenths* of a second!';
+   $em = $this->getDoctrine()->getManager();
+   $genus = $em->getRepository('AppBundle:Genus')
+     ->findOneBy(['name' => $genusName]);
 
-    $cache = $this->get('doctrine_cache.providers.my_markdown_cache');
-    $key = md5($funFact);
-    if ($cache->contains($key)) {
-      $funFact = $cache->fetch($key);
-    }
-    else {
-      sleep(1);
-      $funFact = $this->get('markdown.parser')
-        ->transform($funFact);
+   if(!$genus) {
+     throw $this->createNotFoundException('No genus found');
+   }
 
-      $cache->save($key, $funFact);
-    }
+
+//    $cache = $this->get('doctrine_cache.providers.my_markdown_cache');
+//    $key = md5($funFact);
+//    if ($cache->contains($key)) {
+//      $funFact = $cache->fetch($key);
+//    }
+//    else {
+//      sleep(1);
+//      $funFact = $this->get('markdown.parser')
+//        ->transform($funFact);
+//
+//      $cache->save($key, $funFact);
+//    }
 
 
     return $this->render('genus/show.html.twig', [
-      'name' => $genusName,
-      'funFact' => $funFact,
+      'genus' => $genus
     ]);
   }
 
@@ -92,26 +132,26 @@ class GenusController extends Controller {
     return new JsonResponse($data);
   }
 
-  /**
-   * @Route("/testform")
-   */
-
-  public function newAction(Request $request) {
-    // creates a task and gives it some dummy data for this example
-    $task = new Task();
-    $task->setTask('Write a blog post');
-    $task->setDueDate(new \DateTime('tomorrow'));
-
-    $form = $this->createFormBuilder($task)
-      ->add('task', TextType::class)
-      ->add('dueDate', DateType::class)
-      ->add('save', SubmitType::class, array('label' => 'Create Task'))
-      ->getForm();
-
-    return $this->render('genus/testform.html.twig', array(
-      'form' => $form->createView(),
-    ));
-  }
+  //  /**
+  //   * @Route("/testform")
+  //   */
+  //
+  //  public function newAction(Request $request) {
+  //    // creates a task and gives it some dummy data for this example
+  //    $task = new Task();
+  //    $task->setTask('Write a blog post');
+  //    $task->setDueDate(new \DateTime('tomorrow'));
+  //
+  //    $form = $this->createFormBuilder($task)
+  //      ->add('task', TextType::class)
+  //      ->add('dueDate', DateType::class)
+  //      ->add('save', SubmitType::class, array('label' => 'Create Task'))
+  //      ->getForm();
+  //
+  //    return $this->render('genus/testform.html.twig', array(
+  //      'form' => $form->createView(),
+  //    ));
+  //  }
 
 
 }
