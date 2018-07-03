@@ -20,72 +20,98 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 
-class GenusController extends Controller
-{
-    /**
-     * @Route("/genus/{genusName}")
-     */
-    public function showAction($genusName)
-    {
+class GenusController extends Controller {
 
-//        $templating = $this->container->get('templating');
-//        $html = $templating->render('genus/show.html.twig', [
-//            'name' => $genusName
-//        ]);
-//
-//        return new Response($html);
-        $funFact = 'Octopuses can change the color of their body in just *three-tenths* of a second!';
+  /**
+   * @Route("/genus/{genusName}")
+   */
+  public function showAction($genusName) {
 
-        $funFact = $this->get('markdown.parser')
-            ->transform($funFact);
+    //        $templating = $this->container->get('templating');
+    //        $html = $templating->render('genus/show.html.twig', [
+    //            'name' => $genusName
+    //        ]);
+    //
+    //        return new Response($html);
+    $funFact = 'Octopuses can change the color of their body in just *three-tenths* of a second!';
 
-        return $this->render('genus/show.html.twig', [
-            'name' => $genusName,
-            'funFact' => $funFact,
-        ]);
+    $cache = $this->get('doctrine_cache.providers.my_markdown_cache');
+    $key = md5($funFact);
+    if ($cache->contains($key)) {
+      $funFact = $cache->fetch($key);
+    }
+    else {
+      sleep(1);
+      $funFact = $this->get('markdown.parser')
+        ->transform($funFact);
+
+      $cache->save($key, $funFact);
     }
 
-    /**
-     * @Route("/genus/{genusName}/notes", name="genus_show_notes")
-     * @Method("GET")
-     */
 
-    public function getNotesAction()
-    {
-        $notes = [
-            ['id' => 1, 'username' => 'AquaPelham', 'avatarUri' => '/images/leanna.jpeg', 'note' => 'Octopus asked me a riddle, outsmarted me', 'date' => 'Dec. 10, 2015'],
-            ['id' => 2, 'username' => 'AquaWeaver', 'avatarUri' => '/images/ryan.jpeg', 'note' => 'I counted 8 legs... as they wrapped around me', 'date' => 'Dec. 1, 2015'],
-            ['id' => 3, 'username' => 'AquaPelham', 'avatarUri' => '/images/leanna.jpeg', 'note' => 'Inked!', 'date' => 'Aug. 20, 2015'],
-        ];
+    return $this->render('genus/show.html.twig', [
+      'name' => $genusName,
+      'funFact' => $funFact,
+    ]);
+  }
 
-        $data = [
-            'notes' => $notes,
-        ];
+  /**
+   * @Route("/genus/{genusName}/notes", name="genus_show_notes")
+   * @Method("GET")
+   */
 
-        return new JsonResponse($data);
-    }
+  public function getNotesAction() {
+    $notes = [
+      [
+        'id' => 1,
+        'username' => 'AquaPelham',
+        'avatarUri' => '/images/leanna.jpeg',
+        'note' => 'Octopus asked me a riddle, outsmarted me',
+        'date' => 'Dec. 10, 2018',
+      ],
+      [
+        'id' => 2,
+        'username' => 'AquaWeaver',
+        'avatarUri' => '/images/ryan.jpeg',
+        'note' => 'I counted 8 legs... as they wrapped around me',
+        'date' => 'Dec. 1, 2018',
+      ],
+      [
+        'id' => 3,
+        'username' => 'AquaPelham',
+        'avatarUri' => '/images/leanna.jpeg',
+        'note' => 'Inked!',
+        'date' => 'Aug. 20, 2018',
+      ],
+    ];
 
-    /**
-     * @Route("/testform")
-     */
+    $data = [
+      'notes' => $notes,
+    ];
 
-    public function newAction(Request $request)
-    {
-        // creates a task and gives it some dummy data for this example
-        $task = new Task();
-        $task->setTask('Write a blog post');
-        $task->setDueDate(new \DateTime('tomorrow'));
+    return new JsonResponse($data);
+  }
 
-        $form = $this->createFormBuilder($task)
-            ->add('task', TextType::class)
-            ->add('dueDate', DateType::class)
-            ->add('save', SubmitType::class, array('label' => 'Create Task'))
-            ->getForm();
+  /**
+   * @Route("/testform")
+   */
 
-        return $this->render('genus/testform.html.twig', array(
-            'form' => $form->createView(),
-        ));
-    }
+  public function newAction(Request $request) {
+    // creates a task and gives it some dummy data for this example
+    $task = new Task();
+    $task->setTask('Write a blog post');
+    $task->setDueDate(new \DateTime('tomorrow'));
+
+    $form = $this->createFormBuilder($task)
+      ->add('task', TextType::class)
+      ->add('dueDate', DateType::class)
+      ->add('save', SubmitType::class, array('label' => 'Create Task'))
+      ->getForm();
+
+    return $this->render('genus/testform.html.twig', array(
+      'form' => $form->createView(),
+    ));
+  }
 
 
 }
