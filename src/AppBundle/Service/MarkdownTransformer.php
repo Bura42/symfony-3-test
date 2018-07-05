@@ -15,10 +15,6 @@ use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
 class MarkdownTransformer {
 
   private $markdownParser;
-
-  /**
-   * @var \Doctrine\Common\Cache\Cache
-   */
   private $cache;
 
   public function __construct(MarkdownParserInterface $markdownParser, Cache $cache) {
