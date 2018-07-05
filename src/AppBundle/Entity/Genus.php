@@ -24,7 +24,8 @@ class Genus {
   private $name;
 
   /**
-   * @ORM\Column(type="string")
+   * @ORM\ManyToOne(targetEntity="AppBundle\Entity\SubFamily")
+   * @ORM\JoinColumn(nullable=false)
    */
   private $subFamily;
 
@@ -62,16 +63,13 @@ class Genus {
   }
 
   /**
-   * @return mixed
+   * @return \AppBundle\Entity\SubFamily
    */
   public function getSubFamily() {
     return $this->subFamily;
   }
 
-  /**
-   * @param mixed $subFamily
-   */
-  public function setSubFamily($subFamily) {
+  public function setSubFamily(SubFamily $subFamily = NULL) {
     $this->subFamily = $subFamily;
   }
 
