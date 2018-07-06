@@ -59,7 +59,6 @@ class Genus {
    */
   private $firstDiscoveredAt;
 
-
   /**
    * @ORM\OneToMany(targetEntity="AppBundle\Entity\GenusNote",mappedBy="genus")
    * @ORM\OrderBy({"createdAt" = "DESC"})
@@ -151,7 +150,6 @@ class Genus {
     $this->name = $name;
   }
 
-
   /**
    * @return ArrayCollection|\AppBundle\Entity\GenusNote[]
    */
@@ -169,7 +167,6 @@ class Genus {
   public function setSubFamily(SubFamily $subFamily = NULL) {
     $this->subFamily = $subFamily;
   }
-
 
   public function getUpdatedAt() {
     return new \DateTime('-' . rand(0, 100) . ' days');
