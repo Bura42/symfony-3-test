@@ -43,7 +43,13 @@ class Genus {
   /**
    * @ORM\Column(type="boolean")
    */
-  private $isPublished = true;
+  private $isPublished = TRUE;
+
+  /**
+   * @ORM\Column(type="date")
+   */
+  private $firstDiscoveredAt;
+
 
   /**
    * @ORM\OneToMany(targetEntity="AppBundle\Entity\GenusNote",mappedBy="genus")
@@ -52,8 +58,17 @@ class Genus {
   private $notes;
 
   public function __construct() {
-  $this->notes = new ArrayCollection();
+    $this->notes = new ArrayCollection();
   }
+
+  /**
+   * @return mixed
+   */
+  public function getisPublished() {
+    return $this->isPublished;
+  }
+
+
 
   /**
    * @param mixed $isPublished
@@ -62,16 +77,15 @@ class Genus {
     $this->isPublished = $isPublished;
   }
 
-  /**
-   * @return \AppBundle\Entity\SubFamily
-   */
-  public function getSubFamily() {
-    return $this->subFamily;
+
+  public function getFirstDiscoveredAt() {
+    return $this->firstDiscoveredAt;
   }
 
-  public function setSubFamily(SubFamily $subFamily = NULL) {
-    $this->subFamily = $subFamily;
+  public function setFirstDiscoveredAt(\DateTime $firstDiscoveredAt = NULL) {
+    $this->firstDiscoveredAt = $firstDiscoveredAt;
   }
+
 
   /**
    * @return mixed
@@ -91,7 +105,7 @@ class Genus {
    * @return mixed
    */
   public function getFunFact() {
-    return 'ASD'.$this->funFact;
+    return 'ASD' . $this->funFact;
   }
 
   /**
@@ -135,6 +149,17 @@ class Genus {
    */
   public function getNotes() {
     return $this->notes;
+  }
+
+  /**
+   * @return SubFamily
+   */
+  public function getSubFamily() {
+    return $this->subFamily;
+  }
+
+  public function setSubFamily(SubFamily $subFamily = NULL) {
+    $this->subFamily = $subFamily;
   }
 
 
