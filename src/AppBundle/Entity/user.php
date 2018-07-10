@@ -10,11 +10,15 @@ namespace AppBundle\Entity;
 
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="user")
+ * @UniqueEntity(fields={"email"},message="already have")
  */
 class user implements UserInterface {
 
@@ -26,6 +30,8 @@ class user implements UserInterface {
   private $id;
 
   /**
+   * @Assert\NotBlank()
+   * @Assert\Email()
    * @ORM\Column(type="string", unique=true)
    */
   private $email;
@@ -35,7 +41,15 @@ class user implements UserInterface {
    */
   private $password;
 
+  /**
+   *  @Assert\NotBlank(groups={"Registration"})
+   */
   private $plainPassword;
+
+  /**
+   * @ORM\Column(type="json_array")
+   */
+  private $roles = [];
 
   public function getUsername() {
 
@@ -44,7 +58,11 @@ class user implements UserInterface {
   }
 
   public function getRoles() {
-    return ['ROLE_USER'];
+    $roles = $this->roles;
+    if(!in_array('ROLE_USER',$roles)){
+      $roles[]='ROLE_USER';
+    }
+    return $roles;
   }
 
   public function getPassword() {
@@ -87,4 +105,20 @@ class user implements UserInterface {
     $this->plainPassword = $plainPassword;
     $this->password = NULL;
   }
+
+  /**
+   * @param mixed $roles
+   */
+  public function setRoles($roles) {
+    $this->roles = $roles;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getEmail() {
+    return $this->email;
+  }
+
+
 }
