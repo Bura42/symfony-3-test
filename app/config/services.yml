@@ -13,3 +13,13 @@ services:
        tags:
           - { name: twig.extension }
        arguments: ['@app.markdown_transformer']
+
+    app.security.login_form_authenticator:
+       class: AppBundle\Secutiry\LoginFormAuthenticator
+       autowire: true
+
+    app.doctrine.hash_password_listener:
+        class: AppBundle\Doctrine\HashPasswordListener
+        autowire: true
+        tags:
+           - { name: doctrine.event_subscriber }
